@@ -3,8 +3,10 @@ import cv2
 import numpy as np
 import io
 from PIL import Image
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}})
 
 def mse(imageA, imageB):
     # Compute the Mean Squared Error between two images
