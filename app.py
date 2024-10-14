@@ -3,10 +3,11 @@ import cv2
 import numpy as np
 import io
 from PIL import Image
+import requests
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}}) 
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 def mse(imageA, imageB):
     # Compute the Mean Squared Error between two images
@@ -36,12 +37,27 @@ def compare_images(image1, image2):
     pil_image = Image.fromarray(thresh)
     return pil_image, error
 
+def download_image(url):
+    # Download an image from a URL and convert it to a NumPy array
+    response = requests.get(url)
+    image = Image.open(io.BytesIO(response.content))
+    return np.array(image)
+
 @app.route('/compare', methods=['POST'])
 def compare():
-    file1 = request.files['image1']
-    file2 = request.files['image2']
-    image1 = np.array(Image.open(file1))
-    image2 = np.array(Image.open(file2))
+    data = request.json
+    url1 = data.get('image_url1')
+    url2 = data.get('image_url2')
+
+    if not url1 or not url2:
+        return jsonify({'error': 'Both image URLs are required.'}), 400
+
+    # Download images from URLs
+    try:
+        image1 = download_image(url1)
+        image2 = download_image(url2)
+    except Exception as e:
+        return jsonify({'error': f'Error downloading images: {str(e)}'}), 500
 
     result_image, error = compare_images(image1, image2)
 
