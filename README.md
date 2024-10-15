@@ -69,3 +69,9 @@ Content-Type: application/json
   "image_url1": "https://example.com/image1.png",
   "image_url2": "https://example.com/image2.png"
 }
+```
+The response will be a PNG image showing the differences.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
